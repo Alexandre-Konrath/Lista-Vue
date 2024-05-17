@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <title>Lista com Vue</title>
+</head>
+<body>
+  <div id="app"></div>
+  <!-- importar a vue -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    // instância do Vuejs, está se ligando ao elemento com o id #app.
+    new Vue({
+      el: '#app',
+      template: `
+        <div class="container mt-5">
+          <h1>Comentários</h1>
+          <hr />
+          <div class="form-todo form-group">
+            <p>
+              <input placeholder="Nome" type="text" name="author" class="form-control" v-model="name" />
+            </p>
+            <p>
+              <textarea id="comentario" placeholder="Comentário" name="message"  class="form-control" v-model="message"></textarea>
+            </p>
+            <button v-on:click="addComment" type="submit" class="btn btn-primary">Comentar</button>
+          </div>
+          <div class="list-group mt-3">
+            <div class="list-group-item" v-for="(comment, index) in allComments">
+              <span class="comment__author">Autor: <strong>{{ comment.name }}</strong></span>
+              <p>{{ comment.message}}</p>
+              <div>
+                <a href="#" title="Excluir" v-on:click.prevent="removeComment(index)">Excluir</a>
+              </div>
+            </div>
+          </div>
+          <hr />
+        </div>
+      `,
+      // função data que retorna um array de objetos, que são representados como 'name' e 'message'
+      data() {
+        return {
+          comments: [],
+          name: '',
+          message: ''
+        }
+      },
+      // aqui é onde você cria as suas funções
+      methods: {
+        // função de adicionar ao carrinho
+        addComment() {
+          // validação simples, se a mensagem for vazia, ele me retorna um alert e da um focus no campo de mensagem
+          if ( this.message.trim() === '' ) {
+            alert("O comentário é obrigatorio")
+            document.getElementById('comentario').focus()
+            return
+          }
+
+          // da um push nos valores que estão salvos de name e message e cria um novo comentário
+          this.comments.push({
+            name: this.name,
+            message: this.message
+          });
+          // two way data binding reverso = estou mexendo no meu model e ele esta refletindo na minha interface
+          this.name = '',
+          this.message = ''
+        },
+
+        // remove os comentarios
+        removeComment(index) {
+          // pega onde esta o index do comentario que eu quero e elimina ele, 1
+          this.comments.splice(index, 1);
+        }
+      },
+
+      // é util para não precisar fazer lógicas dentro do seu template
+      computed: {
+        // função que formata o comentário colocando um 'Anônimo' se o campo for fazio
+        allComments() {
+          return this.comments.map(comments => ({
+            ...comments,
+            name: comments.name.trim() === '' ? 'Anônimo' : comments.name
+          }))
+        }
+      },
+
+      // fica olhando tudo que é alterado dentro do meu html. Permite monitorar alterações em propriedades específicas dos dados e executar lógica em resposta a essas alterações
+      watch: {
+        // qualquer alteração que aconteça dentro do meu comentario ele executa uma função
+        comments(val){
+          console.log('val', val)
+        }
+      }
+
+    });
+  </script>
+
+</body>
+</html>
